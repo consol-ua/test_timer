@@ -11,7 +11,7 @@ const TimerButton = (props) => {
   return (
     <div className="buttonBlock">
       <button onClick={() => props.onClickStart()}>Start/Stop</button>
-      <button onClick={() => props.testButton()}>Wait</button>
+      <button onDoubleClick={() => props.testButton()}>Wait</button>
       <button onClick={() => props.onClickReset()}>Reset</button>
     </div>
   );
