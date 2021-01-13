@@ -11,6 +11,11 @@
   padding: 15px;
   border: 1px solid black;
 }
+.timerBoard {
+  font-size: 25px;
+  font-weight: 600;
+  text-decoration: underline;
+}
 
 .buttonBlock {
   max-width: 600px;
