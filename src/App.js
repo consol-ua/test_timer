@@ -18,61 +18,86 @@ const TimerButton = (props) => {
 };
 
 export default class App extends React.Component {
+  _defaultState = {
+    hh: "00",
+    mm: "00",
+    ss: "00",
+    dateStartTimer: 0,
+    // isWait: false,
+    time: 0
+  };
   state = {
-    dateNow: null,
-    dateStartTimer: null,
-    hh: "01",
-    mm: "01",
-    ss: "01",
-    isStarted: true,
-    isWait: false
+    ...this._defaultState
   };
   constructor(props) {
     super(props);
     this.resetTimer = this.resetTimer.bind(this);
     this.startTimer = this.startTimer.bind(this);
     this.updateBoard = this.updateBoard.bind(this);
+    this.dateNow = this.dateNow.bind(this);
   }
 
   resetTimer() {
-    const defaultTime = {
-      hh: "00",
-      mm: "00",
-      ss: "00"
-    };
-    this.setState(defaultTime);
+    this.setState({ ...this._defaultState, dateStartTimer: Date.now() });
+    console.log(this.state);
   }
   dateNow() {
     let dateNow = Date.now();
-    this.setState({ dateNow });
+    let time =
+      this.state.time < dateNow - this.state.dateStartTimer
+        ? dateNow - this.state.dateStartTimer
+        : this.state.time + (dateNow - this.state.dateStartTimer);
+    let hhmmss = this.msToTime(time);
+    this.setState({ time, ...hhmmss });
+
+    console.log(this.state);
   }
   startTimer() {
     if (this.state.isStarted) {
+      clearInterval(this.state.tick);
       this.setState({
+        ...this._defaultState,
+        isStarted: false
+      });
+      console.log("this.state.isStarted");
+    } else if (!this.state.isStarted && this.state.isWait) {
+      debugger;
+      this.setState({
+        isWait: false,
+        isStarted: true,
+        dateStartTimer: Date.now(),
+        tick: setInterval(() => this.dateNow(), 1000)
+      });
+      console.log("!this.state.isStarted && this.state.isWait");
+    } else {
+      this.setState({
+        isStarted: true,
+        dateStartTimer: Date.now(),
+        tick: setInterval(() => this.dateNow(), 1000)
+      });
+      console.log("start");
+    }
+  }
+  msToTime(duration) {
+    let seconds = parseInt((duration / 1000) % 60),
+      minutes = parseInt((duration / (1000 * 60)) % 60),
+      hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+    return { hh: hours, mm: minutes, ss: seconds };
+  }
+  updateBoard() {
+    if (this.state.isStarted && !this.state.isWait) {
+      clearInterval(this.state.tick);
+      this.setState({
+        isWait: true,
         isStarted: false
       });
     }
-    this.dateNow();
-    this.setState({ isStarted: true });
-  }
-  updateBoard(hh, mm, ss) {
-    // function msToTime(duration) {
-    //   let milliseconds = parseInt((duration % 1000) / 100),
-    //     seconds = parseInt((duration / 1000) % 60),
-    //     minutes = parseInt((duration / (1000 * 60)) % 60),
-    //     hours = parseInt((duration / (1000 * 60 * 60)) % 24);
-
-    //   hours = hours < 10 ? "0" + hours : hours;
-    //   minutes = minutes < 10 ? "0" + minutes : minutes;
-    //   seconds = seconds < 10 ? "0" + seconds : seconds;
-
-    //   return { hh: hours, mm: minutes, ss: seconds };
-    // }
-    if (this.state.isStarted) {
-      let timerDate = this.state.dateNow - this.state.dateStartTimer;
-      console.log(timerDate);
-      console.log(this.state);
-    }
+    console.log(this.state);
   }
 
   render() {
