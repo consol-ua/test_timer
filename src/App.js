@@ -11,7 +11,7 @@ const TimerButton = (props) => {
   return (
     <div className="buttonBlock">
       <button onClick={() => props.onClickStart()}>Start/Stop</button>
-      <button onDoubleClick={() => props.testButton()}>Wait</button>
+      <button onDoubleClick={() => props.onClickWait()}>Wait</button>
       <button onClick={() => props.onClickReset()}>Reset</button>
     </div>
   );
@@ -33,7 +33,7 @@ export default class App extends React.Component {
     super(props);
     this.resetTimer = this.resetTimer.bind(this);
     this.startTimer = this.startTimer.bind(this);
-    this.updateBoard = this.updateBoard.bind(this);
+    this.waitTimer = this.waitTimer.bind(this);
     this.dateNow = this.dateNow.bind(this);
   }
 
@@ -79,9 +79,9 @@ export default class App extends React.Component {
     }
   }
   msToTime(duration) {
-    let seconds = parseInt((duration / 1000) % 60),
-      minutes = parseInt((duration / (1000 * 60)) % 60),
-      hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+    let seconds = parseInt((duration / 1000) % 60, 10),
+      minutes = parseInt((duration / (1000 * 60)) % 60, 10),
+      hours = parseInt((duration / (1000 * 60 * 60)) % 24, 10);
 
     hours = hours < 10 ? "0" + hours : hours;
     minutes = minutes < 10 ? "0" + minutes : minutes;
@@ -89,7 +89,7 @@ export default class App extends React.Component {
 
     return { hh: hours, mm: minutes, ss: seconds };
   }
-  updateBoard() {
+  waitTimer() {
     if (this.state.isStarted && !this.state.isWait) {
       clearInterval(this.state.tick);
       this.setState({
@@ -101,7 +101,7 @@ export default class App extends React.Component {
   }
 
   render() {
-    // console.log(this.state);
+    return (
     return (
       <div className="App">
         <h1>Timer</h1>
@@ -113,7 +113,7 @@ export default class App extends React.Component {
         <TimerButton
           onClickReset={this.resetTimer}
           onClickStart={this.startTimer}
-          testButton={this.updateBoard}
+          onClickWait={this.waitTimer}
         />
       </div>
     );
