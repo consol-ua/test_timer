@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-import App from "./App";
+import TimerContainer from "./TimerContainer";
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <TimerContainer />
   </React.StrictMode>,
   rootElement
 );

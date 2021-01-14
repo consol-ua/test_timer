@@ -2,24 +2,9 @@ import React from "react";
 import { interval } from "rxjs";
 import { takeWhile } from "rxjs/operators";
 import "./styles.css";
+import Timer from "./Timer";
 
-const TimerWrapper = (props) => {
-  return (
-    <div className="timerBoard">{`${props.hh}:${props.mm}:${props.ss}`}</div>
-  );
-};
-
-const TimerButton = (props) => {
-  return (
-    <div className="buttonBlock">
-      <button onClick={() => props.onClickStart()}>Start/Stop</button>
-      <button onDoubleClick={() => props.onClickWait()}>Wait(dbClick)</button>
-      <button onClick={() => props.onClickReset()}>Reset</button>
-    </div>
-  );
-};
-
-export default class App extends React.Component {
+export default class TimerContainer extends React.Component {
   _defaultState = {
     hh: "00",
     mm: "00",
@@ -38,9 +23,6 @@ export default class App extends React.Component {
     this.waitTimer = this.waitTimer.bind(this);
   }
 
-  resetTimer() {
-    this.setState({ ...this._defaultState, dateStartTimer: Date.now() });
-  }
   dateNow(offSet) {
     let dateNow = Date.now();
     let tickTime = dateNow - this.state.dateStartTimer;
@@ -48,6 +30,10 @@ export default class App extends React.Component {
     let hhmmss = this.msToTime(time);
     this.setState({ time, ...hhmmss, tickTime, offSet });
   }
+  resetTimer() {
+    this.setState({ ...this._defaultState, dateStartTimer: Date.now() });
+  }
+
   startTimer() {
     if (this.state.isStarted) {
       this.setState({
@@ -70,6 +56,14 @@ export default class App extends React.Component {
       });
     }
   }
+  waitTimer() {
+    if (this.state.isStarted && !this.state.isWait) {
+      this.setState({
+        isWait: true,
+        isStarted: false
+      });
+    }
+  }
   msToTime(duration) {
     let seconds = parseInt((duration / 1000) % 60, 10),
       minutes = parseInt((duration / (1000 * 60)) % 60, 10),
@@ -81,25 +75,14 @@ export default class App extends React.Component {
 
     return { hh: hours, mm: minutes, ss: seconds };
   }
-  waitTimer() {
-    if (this.state.isStarted && !this.state.isWait) {
-      this.setState({
-        isWait: true,
-        isStarted: false
-      });
-    }
-  }
 
   render() {
     return (
       <div className="App">
-        <h1>Timer</h1>
-        <TimerWrapper
+        <Timer
           hh={this.state.hh}
           mm={this.state.mm}
           ss={this.state.ss}
-        />
-        <TimerButton
           onClickReset={this.resetTimer}
           onClickStart={this.startTimer}
           onClickWait={this.waitTimer}
