@@ -1,5 +1,6 @@
 import React from "react";
 import { interval } from "rxjs";
+import { takeWhile } from "rxjs/operators";
 import "./styles.css";
 
 const TimerWrapper = (props) => {
@@ -24,7 +25,8 @@ export default class App extends React.Component {
     mm: "00",
     ss: "00",
     dateStartTimer: 0,
-    time: 0
+    time: 0,
+    stream: interval(1000).pipe(takeWhile(() => this.state.isStarted))
   };
   state = {
     ...this._defaultState
@@ -38,42 +40,34 @@ export default class App extends React.Component {
 
   resetTimer() {
     this.setState({ ...this._defaultState, dateStartTimer: Date.now() });
-    console.log(this.state);
   }
-  dateNow() {
+  dateNow(offSet) {
     let dateNow = Date.now();
-    let time =
-      this.state.time < dateNow - this.state.dateStartTimer
-        ? dateNow - this.state.dateStartTimer
-        : this.state.time + (dateNow - this.state.dateStartTimer);
+    let tickTime = dateNow - this.state.dateStartTimer;
+    let time = this.state.time < tickTime ? tickTime : offSet + tickTime;
     let hhmmss = this.msToTime(time);
-    this.setState({ time, ...hhmmss });
-
-    console.log(this.state);
+    this.setState({ time, ...hhmmss, tickTime, offSet });
   }
   startTimer() {
     if (this.state.isStarted) {
-      clearInterval(this.state.tick);
       this.setState({
         ...this._defaultState,
         isStarted: false
       });
-      console.log("this.state.isStarted");
     } else if (!this.state.isStarted && this.state.isWait) {
+      let offSetTime = this.state.time;
       this.setState({
         isWait: false,
         isStarted: true,
         dateStartTimer: Date.now(),
-        tick: setInterval(() => this.dateNow(), 1000)
+        tick: this.state.stream.subscribe((e) => this.dateNow(offSetTime))
       });
-      console.log("!this.state.isStarted && this.state.isWait");
     } else {
       this.setState({
         isStarted: true,
         dateStartTimer: Date.now(),
-        tick: setInterval(() => this.dateNow(), 1000)
+        tick: this.state.stream.subscribe((e) => this.dateNow())
       });
-      console.log("start");
     }
   }
   msToTime(duration) {
@@ -89,20 +83,13 @@ export default class App extends React.Component {
   }
   waitTimer() {
     if (this.state.isStarted && !this.state.isWait) {
-      clearInterval(this.state.tick);
       this.setState({
         isWait: true,
         isStarted: false
       });
     }
-    console.log(this.state);
   }
-  streamTest() {
-    const streamTime = interval(1000).subscribe((e) => this.dateNow());
-    setTimeout(() => {
-      streamTime.unsubscribe();
-    }, 5000);
-  }
+
   render() {
     return (
       <div className="App">
