@@ -1,4 +1,5 @@
 import React from "react";
+import { interval } from "rxjs";
 import "./styles.css";
 
 const TimerWrapper = (props) => {
@@ -23,7 +24,6 @@ export default class App extends React.Component {
     mm: "00",
     ss: "00",
     dateStartTimer: 0,
-    // isWait: false,
     time: 0
   };
   state = {
@@ -34,7 +34,6 @@ export default class App extends React.Component {
     this.resetTimer = this.resetTimer.bind(this);
     this.startTimer = this.startTimer.bind(this);
     this.waitTimer = this.waitTimer.bind(this);
-    this.dateNow = this.dateNow.bind(this);
   }
 
   resetTimer() {
@@ -61,7 +60,6 @@ export default class App extends React.Component {
       });
       console.log("this.state.isStarted");
     } else if (!this.state.isStarted && this.state.isWait) {
-      debugger;
       this.setState({
         isWait: false,
         isStarted: true,
@@ -99,7 +97,12 @@ export default class App extends React.Component {
     }
     console.log(this.state);
   }
-
+  streamTest() {
+    const streamTime = interval(1000).subscribe((e) => this.dateNow());
+    setTimeout(() => {
+      streamTime.unsubscribe();
+    }, 5000);
+  }
   render() {
     return (
       <div className="App">
